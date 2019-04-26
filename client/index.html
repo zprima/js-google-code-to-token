@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+
+<body>
+
+  <script src="https://apis.google.com/js/client.js?onload=init"></script>
+  <script>
+    var auth2;
+
+    function init() {
+      gapi.load('auth2', function () {
+        auth2 = gapi.auth2.init({
+          client_id: 'YOUR CLIENT HERE',
+          scope: 'profile email'
+        });
+      })
+    }
+
+    function login() {
+      auth2.grantOfflineAccess({ 'redirect_uri': 'postmessage', 'approval_prompt': 'force' }).then(onSignIn);
+    }
+
+    function onSignIn(auth) {
+      const code = auth.code
+      console.log("Code from google is: ", code)
+
+      var data = { code: code };
+      var url = "http://localhost:8080/auth/google"
+
+      fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        referrer: "no-referrer",
+        body: JSON.stringify(data)
+      }).then(response => response.json())
+        .then(data => {
+          console.log("response from server:", data)
+        });
+    }
+
+    function logout() {
+      auth2.signOut().then(function () {
+        console.log('User signed out.');
+      });
+    }
+
+    init();
+  </script>
+
+  <button onclick="login()">Login</button>
+  <button onclick="logout()">Logout</button>
+</body>
+
+</html>
