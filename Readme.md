@@ -1,0 +1,1 @@
+Run client on port 3000 and server on port 8080.
